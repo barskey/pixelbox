@@ -11,7 +11,7 @@
 			<div class="span10">
 				<!--Table content-->
 				<div>
-					Select a color: <input type='text' name='togglePaletteOnly' id='togglePaletteOnly' />
+					Select a color: <input type='text' id='myPicker' name='myPicker' />
 				</div>
 				<form action="" method="post" name="pixTable">
 					<div class="pixTable" class="container">
@@ -41,8 +41,13 @@
 		</div>
 	</form>
 	<script>
+	$("#myPicker").spectrum({
+		showPaletteOnly: true,
+		togglePaletteOnly: true,
+		hideAfterPaletteSelect: true
+	});
 	$( ".pixCell" ).click(function() {
-		var setColor = $("#togglePaletteOnly").spectrum("get")
+		var setColor = $("#myPicker").spectrum("get")
 		$( this ).css( "background-color", setColor);
 		$( this ).find( "input" ).val ( setColor.toHex() );
 	});
@@ -50,5 +55,5 @@
 		$( ".pixCell" ).css( "background-color", "#000000");
 		$( ".pixCell input" ).val( "#000000" );
 	});
-	</script>
+	</script>	
 {% endblock %}
