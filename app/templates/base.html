@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% if title %}
+		<title>{{ title }} - PixelBox App</title>
+		{% else %}
+		<title>PixelBox App</title>
+		{% endif %}
+		<link href="/static/css/spectrum.css" rel="stylesheet">
+		<link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
+		<link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+		<link href="/static/css/docs/docs.css" rel="stylesheet">
+		<link href="/static/css/main.css" rel="stylesheet">
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<script src="/static/js/bootstrap.js"></script>
+		<script src="/static/js/spectrum.js"></script>
+		<script src="/static/docs/docs.js"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+	<body>
+		<ul class="nav nav-pills">
+			<li class="active">
+				<a href="#">Settings</a>
+			</li>
+			<li><a href="#">Images</a></li>
+			<li class="disabled"><a href="#">Draw</a></li>
+		</ul>
+		{% block content %}{% endblock %}
+	</body>
+</html>

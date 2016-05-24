@@ -1,0 +1,54 @@
+<!-- extend from base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span2">
+				<!--Sidebar content-->
+				Images
+			</div>
+			<div class="span10">
+				<!--Table content-->
+				<div>
+					Select a color: <input type='text' name='togglePaletteOnly' id='togglePaletteOnly' />
+				</div>
+				<form action="" method="post" name="pixTable">
+					<div class="pixTable" class="container">
+						{% for r in range(16) %}
+						<div class="pixRow">
+							{% for c in range(16) %}
+							<div class="pixCell" id="{{ c }},{{ r }}">
+								{{ form.pixValue }}
+							</div>
+							{% endfor %}
+						</div>
+						{% endfor %}
+					</div>
+					<div>
+						<button type="button" class="btn btn-danger" id="alloff">All Off</button><button type="button" class="btn btn-success" id="savebtn">Save</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<form class="form-horizontal">
+		<div class="form-group">
+			<label for="fileName">Image Name</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" id="fileName" placeholder="Image Name">
+			</div>
+		</div>
+	</form>
+	<script>
+	$( ".pixCell" ).click(function() {
+		var setColor = $("#togglePaletteOnly").spectrum("get")
+		$( this ).css( "background-color", setColor);
+		$( this ).find( "input" ).val ( setColor.toHex() );
+	});
+	$( "#alloff" ).click(function() {
+		$( ".pixCell" ).css( "background-color", "#000000");
+		$( ".pixCell input" ).val( "#000000" );
+	});
+	</script>
+{% endblock %}
