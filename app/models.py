@@ -6,7 +6,7 @@ class Img(db.Model):
 	animated = db.Column(db.Boolean)
 	fps = db.Column(db.Integer)
 	pixels = db.relationship('Pixel', backref='pic', lazy='dynamic')
-	
+            
 	def __repr__(self):
 		return '<Image %r>' % (self.imgname)
 
