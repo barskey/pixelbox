@@ -9,7 +9,7 @@
                 Select a color: <input type='text' id='myPicker' name='myPicker' />
             </div>
             <form action="" method="post" name="pixTable">
-                <div class="pixTable" class="container">
+                <div class="pixTable">
                     {% for r in range(16) %}
                     <div class="pixRow">
                         {% for c in range(16) %}
@@ -27,19 +27,31 @@
         </div>
 	</div>
 	<script>
-	$("#myPicker").spectrum({
-		showPaletteOnly: true,
-		togglePaletteOnly: true,
-		hideAfterPaletteSelect: true
-	});
-	$( ".pixCell" ).click(function() {
-		var setColor = $("#myPicker").spectrum("get")
-		$( this ).css( "background-color", setColor);
-		$( this ).find( "input" ).val ( setColor.toHex() );
-	});
-	$( "#alloff" ).click(function() {
-		$( ".pixCell" ).css( "background-color", "#000000");
-		$( ".pixCell input" ).val( "#000000" );
-	});
+        $mouse_is_down = false;
+        $setColor = $("#myPicker").spectrum("get");
+        $( ".pixCell" ).mousedown(function() {
+            $mouse_is_down = true;
+            $setColor = $("#myPicker").spectrum("get");
+            $( this ).css( "background-color", $setColor);
+            $( this ).find( "input" ).val ( $setColor.toHex() );
+        });
+        $( ".pixCell" ).mouseup(function() {
+            $mouse_is_down = false;
+        });
+        $( ".pixCell" ).mouseenter(function() {
+            if ($mouse_is_down) {
+                $( this ).css( "background-color", $setColor);
+                $( this ).find( "input" ).val ( $setColor.toHex() );
+            } 
+        });
+        $( "#myPicker" ).spectrum({
+            showPaletteOnly: true,
+            togglePaletteOnly: true,
+            hideAfterPaletteSelect: true
+        });
+        $( "#alloff" ).click(function() {
+            $( ".pixCell" ).css( "background-color", "#000000");
+            $( ".pixCell input" ).val( "#000000" );
+        });
 	</script>	
 {% endblock %}

@@ -7,3 +7,6 @@ class TableForm(Form):
 
 class SettingsForm(Form):
     imgduration = StringField('imgduration', default='30', validators=[DataRequired()])
+
+class ImagesForm(Form):
+    imgname = StringField('imgname', validators=[DataRequired()])

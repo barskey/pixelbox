@@ -6,19 +6,6 @@
     border-color: gray;
     cursor: pointer;
 }
-.Title
-{
-    display: table-caption;
-    text-align: center;
-    font-weight: bold;
-    font-size: larger;
-}
-.Heading
-{
-    display: table-row;
-    font-weight: bold;
-    text-align: center;
-}
 .pixRow
 {
     display: table-row;
@@ -30,6 +17,6 @@
     border-width: thin;
     border-color: gray;
     background-color: black;
-    width: 18px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
 }

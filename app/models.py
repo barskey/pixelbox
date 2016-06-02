@@ -6,7 +6,19 @@ class Img(db.Model):
 	animated = db.Column(db.Boolean)
 	fps = db.Column(db.Integer)
 	pixels = db.relationship('Pixel', backref='pic', lazy='dynamic')
-            
+	
+	@staticmethod
+	def make_unique_imgname(imgname):
+		if Img.query.filter_by(imgname=imgname).first() is None:
+			return imgname
+		version = 2
+		while True:
+			new_imgname = imgname + str(version)
+			if Img.query.filter_by(imgname=new_imgname).first() is None:
+				break
+			version += 1
+		return new_imgname
+	
 	def __repr__(self):
 		return '<Image %r>' % (self.imgname)
 
