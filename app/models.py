@@ -7,13 +7,19 @@ class Img(db.Model):
 	fps = db.Column(db.Integer)
 	pixels = db.relationship('Pixel', backref='pic', lazy='dynamic')
 	
+	def get_id(self):
+		try:
+			return unicode(self.id)	 # python 2
+		except NameError:
+			return str(self.id)	 # python 3
+	
 	@staticmethod
-	def make_unique_imgname(imgname):
-		if Img.query.filter_by(imgname=imgname).first() is None:
-			return imgname
+	def make_unique_imgname(tempname):
+		if Img.query.filter_by(imgname=tempname).first() is None:
+			return tempname
 		version = 2
 		while True:
-			new_imgname = imgname + str(version)
+			new_imgname = tempname + str(version)
 			if Img.query.filter_by(imgname=new_imgname).first() is None:
 				break
 			version += 1

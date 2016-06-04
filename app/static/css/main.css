@@ -1,3 +1,7 @@
+body
+{
+	padding-top: 70px;
+}
 .pixTable
 {
     display: table;
@@ -17,6 +21,11 @@
     border-width: thin;
     border-color: gray;
     background-color: black;
-    width: 30px;
-    height: 30px;
+    width: 6%;
+}
+.pixCell:before
+{
+	content: '';
+	padding: 40% 0;
+	display: inline-block;
 }

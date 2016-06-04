@@ -1,0 +1,61 @@
+<!-- extend from base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="container">
+		<h4>Select an image to edit:</h4>
+		<ul class="list-group">
+			{% for i in image_list %}
+			<li id="{{ i.id }}" class="list-group-item">
+				<button type="button" class="btn btn-default" id="imgbtn">
+					<img src="{{ url_for('static', filename='thumbs/03.png') }}">
+				</button>
+				&nbsp;&nbsp;&nbsp;{{ i.imgname }}
+				<span class="pull-right">
+					<span class="text-danger hidden">Delete?</span>
+					<button type="button" class="btn btn-success hidden">
+						<span class="glyphicon glyphicon-ban-circle"></span>
+					</button>
+					<button type="button" class="btn btn-default">
+						<span class="glyphicon glyphicon-trash"></span>
+					</button>
+				</span>
+			</li>
+			{% endfor %}
+			<li class="list-group-item">
+				<form action="" method="post" name="newimg" class="form-inline">
+					{{ form.hidden_tag() }}
+					<div class="input-group">
+						{{ form.imgname(size=10, class="form-control", placeholder="Add new image") }}
+						<span class="input-group-btn">
+							<button type="submit" class="btn btn-default">Add</button>
+						</span>
+					</div><!-- /input-group -->
+				</form>
+			</li>
+		</ul>
+	</div>
+	<script>
+		$( "li" ).removeClass( "active" );
+		$( "#nav-images" ).addClass( "active" );
+		$( ".btn-default" ).click(function() {
+			if ( $( this ).hasClass( "btn-danger" ) ) {
+				var imgid = $( this ).parent().parent().attr("id");
+				location.href = "/delete_image?imgid=" + imgid;
+			} else if ( $( this ).attr( "id" ) == "imgbtn" ) {
+				var imgid = $( this ).parent().attr("id");
+				location.href = "/table?imgid=" + imgid;
+			} else {
+				$( this ).parent().find( ".hidden" ).removeClass( "hidden" );
+				$( this ).removeClass( "btn-default" );
+				$( this ).addClass( "btn-danger" );
+			}
+		});
+		$( ".btn-success" ).click(function() {
+			$( this ).addClass( "hidden" );
+			$( this ).parent().find( ".text-danger" ).addClass( "hidden" );
+			$( this ).parent().find( ".btn-danger" ).addClass( "btn-default" );
+			$( this ).parent().find( ".btn-danger" ).removeClass( "btn-danger" );
+		});
+	</script>
+{% endblock %}

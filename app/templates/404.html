@@ -1,0 +1,9 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="alert alert-danger" role="alert">
+    <h3>File Not Found</h3>
+    <p><a href="{{ url_for('index') }}" class="alert-link">Back</a></p>
+</div>
+{% endblock %}

@@ -3,55 +3,83 @@
 
 {% block content %}
 	<div class="container-fluid">
-        <div class="span10">
-            <!--Table content-->
-            <div>
-                Select a color: <input type='text' id='myPicker' name='myPicker' />
-            </div>
-            <form action="" method="post" name="pixTable">
-                <div class="pixTable">
-                    {% for r in range(16) %}
-                    <div class="pixRow">
-                        {% for c in range(16) %}
-                        <div class="pixCell" id="{{ c }},{{ r }}">
-                            {{ form.pixValue }}
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% endfor %}
-                </div>
-                <div>
-                    <button type="button" class="btn btn-danger" id="alloff">All Off</button><button type="button" class="btn btn-success" id="savebtn">Save</button>
-                </div>
-            </form>
-        </div>
+		<!--Table content-->
+		<form action="" method="post" name="pixTable">
+			<div class="pixTable" style="width: 100%">
+				{% for r in range(16) %}
+				<div class="pixRow">
+					{% for c in range(16) %}
+					<div class="pixCell" id="{{ r }},{{ c }}" style="background-color:#{{ pixels[r][c] }};"></div>
+					{% endfor %}
+				</div>
+				{% endfor %}
+			</div>
+			<div class="container">
+				<span><input type='text' id='myPicker' name='myPicker' /></span>
+				<button type="button" class="btn btn-default" id="fill"><span style="color:gray">Set All<span></button>
+				<button type="button" class="btn btn-success" id="savebtn" disabled="disabled">Save</button>
+			</div>
+		</form>
 	</div>
 	<script>
-        $mouse_is_down = false;
-        $setColor = $("#myPicker").spectrum("get");
-        $( ".pixCell" ).mousedown(function() {
-            $mouse_is_down = true;
-            $setColor = $("#myPicker").spectrum("get");
-            $( this ).css( "background-color", $setColor);
-            $( this ).find( "input" ).val ( $setColor.toHex() );
-        });
-        $( ".pixCell" ).mouseup(function() {
-            $mouse_is_down = false;
-        });
-        $( ".pixCell" ).mouseenter(function() {
-            if ($mouse_is_down) {
-                $( this ).css( "background-color", $setColor);
-                $( this ).find( "input" ).val ( $setColor.toHex() );
-            } 
-        });
+		$( "li" ).removeClass("active");
+		$( "#nav-edit" ).addClass("active");
         $( "#myPicker" ).spectrum({
             showPaletteOnly: true,
             togglePaletteOnly: true,
-            hideAfterPaletteSelect: true
+            hideAfterPaletteSelect: true,
+            change: function(color) {
+            	$( "#fill" ).css( "background-color", color );
+            }
         });
-        $( "#alloff" ).click(function() {
-            $( ".pixCell" ).css( "background-color", "#000000");
-            $( ".pixCell input" ).val( "#000000" );
+        $setColor = $("#myPicker").spectrum("get");
+        $mouse_is_down = false;
+        var pixarray = [];
+        var size = 16;
+		while(size--) {
+			pixarray.push([]);
+		}
+		$( document ).ready(function() {
+			$( ".pixCell" ).each(function() {
+				var hex = tinycolor($( this ).css( "background-color" )).toHex();
+				var ident = $( this ).attr("id");
+				var identsplit = ident.split(",");
+				var row = parseInt(identsplit[0], 10);
+				var col = parseInt(identsplit[1], 10);
+				pixarray[row][col] = hex;
+			});
+			$( "#myPicker" ).spectrum( "set", "#FFF" );
+		});
+        $( ".pixCell" ).mousedown(function() {
+            $setColor = $("#myPicker").spectrum("get");
+            $( this ).css( "background-color", $setColor );
+            $( this ).find( "input" ).val ( $setColor.toHex() );
+            $mouse_is_down = true;
         });
-	</script>	
+        $( document.body ).mouseup(function() {
+            $mouse_is_down = false;
+            $( "#savebtn" ).removeAttr( "disabled" );
+        });
+        $( ".pixCell" ).mouseenter(function() {
+            if ($mouse_is_down) {
+                $( this ).css( "background-color", $setColor );
+                $( this ).find( "input" ).val ( $setColor.toHex() );
+            } 
+        });
+        $( "#fill" ).click(function() {
+            $( ".pixCell" ).css( "background-color", $("#myPicker").spectrum("get") );
+            $( ".pixCell input" ).val( "000000" );
+            $( "#savebtn" ).removeAttr( "disabled" );
+        });
+        $( "#savebtn" ).click(function() {
+			$( ".pixCell" ).each(function() {
+				var thisval = $( this ).css( "background-color" );
+				var ident = $( this ).attr("id");
+				var identsplit = ident.split(",");
+				var row = parseInt(identsplit[0], 10);
+				var col = parseInt(identsplit[1], 10);
+				pixarray[row][col] = thisval;
+			});
+        });
+	</script>
 {% endblock %}
