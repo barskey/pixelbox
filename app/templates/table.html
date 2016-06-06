@@ -4,12 +4,15 @@
 {% block content %}
 	<div class="container-fluid">
 		<!--Table content-->
-		<form action="" method="post" name="pixTable">
+		<form action="update_pixels" method="post" name="pixTable">
+			{{ form.imgid(value=imgid) }}
 			<div class="pixTable" style="width: 100%">
 				{% for r in range(16) %}
 				<div class="pixRow">
 					{% for c in range(16) %}
-					<div class="pixCell" id="{{ r }},{{ c }}" style="background-color:#{{ pixels[r][c] }};"></div>
+					<div class="pixCell" id="{{ r }},{{ c }}" style="background-color:#{{ pixels[r][c] }};">
+						<input type="hidden" name="{{ r }},{{ c }}" value="row={{ r|string }},col={{ c|string }},h={{ pixels[r][c] }}" />
+					</div>
 					{% endfor %}
 				</div>
 				{% endfor %}
@@ -17,13 +20,14 @@
 			<div class="container">
 				<span><input type='text' id='myPicker' name='myPicker' /></span>
 				<button type="button" class="btn btn-default" id="fill"><span style="color:gray">Set All<span></button>
-				<button type="button" class="btn btn-success" id="savebtn" disabled="disabled">Save</button>
+				<button type="button" class="btn" id="revertbtn" disabled="disabled">Revert</button>
+				<button type="submit" class="btn" id="savebtn" disabled="disabled">Save</button>
 			</div>
 		</form>
 	</div>
 	<script>
-		$( "li" ).removeClass("active");
-		$( "#nav-edit" ).addClass("active");
+		var mouse_is_down = false;
+		var setColor = "white";
         $( "#myPicker" ).spectrum({
             showPaletteOnly: true,
             togglePaletteOnly: true,
@@ -32,54 +36,50 @@
             	$( "#fill" ).css( "background-color", color );
             }
         });
-        $setColor = $("#myPicker").spectrum("get");
-        $mouse_is_down = false;
-        var pixarray = [];
-        var size = 16;
-		while(size--) {
-			pixarray.push([]);
-		}
-		$( document ).ready(function() {
-			$( ".pixCell" ).each(function() {
-				var hex = tinycolor($( this ).css( "background-color" )).toHex();
-				var ident = $( this ).attr("id");
-				var identsplit = ident.split(",");
-				var row = parseInt(identsplit[0], 10);
-				var col = parseInt(identsplit[1], 10);
-				pixarray[row][col] = hex;
-			});
-			$( "#myPicker" ).spectrum( "set", "#FFF" );
-		});
-        $( ".pixCell" ).mousedown(function() {
-            $setColor = $("#myPicker").spectrum("get");
-            $( this ).css( "background-color", $setColor );
-            $( this ).find( "input" ).val ( $setColor.toHex() );
-            $mouse_is_down = true;
+        $( document ).ready(function() {
+			$( "li" ).removeClass("active");
+			$( "#nav-edit" ).addClass("active");
+			$( "#myPicker" ).spectrum( "set", setColor );
         });
-        $( document.body ).mouseup(function() {
-            $mouse_is_down = false;
+        $( ".pixCell" ).mousedown(function() {
+            setColor = $("#myPicker").spectrum("get");
+            $( this ).css( "background-color", setColor );
+            var value = $( this ).find( "input" ).val().split(",");
+            var newValue = value[0] + "," + value[1] + ",h=" + setColor.toHex();
+            $( this ).find( "input" ).val( newValue );
             $( "#savebtn" ).removeAttr( "disabled" );
+            $( "#revertbtn" ).removeAttr( "disabled" );
+            $( "#revertbtn" ).addClass( "btn-success" );
+            $( "#savebtn" ).addClass( "btn-warning" );
+            mouse_is_down = true;
+        });
+        $( document ).mouseup(function() {
+            mouse_is_down = false;
         });
         $( ".pixCell" ).mouseenter(function() {
-            if ($mouse_is_down) {
-                $( this ).css( "background-color", $setColor );
-                $( this ).find( "input" ).val ( $setColor.toHex() );
+            if (mouse_is_down) {
+				$( this ).css( "background-color", setColor );
+				var value = $( this ).find( "input" ).val().split(",");
+				var newValue = value[0] + "," + value[1] + ",h=" + setColor.toHex();
+				$( this ).find( "input" ).val( newValue );
+				$( "#savebtn" ).removeAttr( "disabled" );
+				$( "#revertbtn" ).removeAttr( "disabled" );
+				$( "#revertbtn" ).addClass( "btn-success" );
+				$( "#savebtn" ).addClass( "btn-warning" );
             } 
         });
         $( "#fill" ).click(function() {
-            $( ".pixCell" ).css( "background-color", $("#myPicker").spectrum("get") );
-            $( ".pixCell input" ).val( "000000" );
+        	setColor = $( "#myPicker" ).spectrum("get");
+            $( ".pixCell" ).css( "background-color", setColor );
+            $( ".pixCell input" ).each(function() {
+				var value = $( this ).val().split(",");
+				var newValue = value[0] + "," + value[1] + ",h=" + setColor.toHex();
+				$( this ).val( newValue );
+            });
             $( "#savebtn" ).removeAttr( "disabled" );
         });
-        $( "#savebtn" ).click(function() {
-			$( ".pixCell" ).each(function() {
-				var thisval = $( this ).css( "background-color" );
-				var ident = $( this ).attr("id");
-				var identsplit = ident.split(",");
-				var row = parseInt(identsplit[0], 10);
-				var col = parseInt(identsplit[1], 10);
-				pixarray[row][col] = thisval;
-			});
+        $( "#revertbtn" ).click(function() {
+            location.reload();
         });
 	</script>
 {% endblock %}

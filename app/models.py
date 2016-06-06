@@ -35,5 +35,13 @@ class Pixel(db.Model):
 	col= db.Column(db.Integer)
 	hexvalue = db.Column(db.String(6))
 	
+	@staticmethod
+	def modelToArray(imgid):
+		pixels = Pixel.query.filter_by(img_id = int(imgid)).order_by(Pixel.row).order_by(Pixel.col)
+		pixelarray = [[0 for r in range(16)] for y in range(16)]
+		for pixel in pixels:
+			pixelarray[pixel.row][pixel.col] = pixel.hexvalue
+		return pixelarray
+	
 	def __repr__(self):
 		return '<Pixel r:%ic:%i %r>' % (self.row, self.col, self.hexvalue)
