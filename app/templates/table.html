@@ -6,28 +6,46 @@
 		<!--Table content-->
 		<form action="update_pixels" method="post" name="pixTable">
 			{{ form.imgid(value=imgid) }}
+			<div class="container">
+				<div class="input-group">
+					<div class="input-group-addon">Name</div>
+					<input type="text" class="form-control" id = "imagename" name="imagename" value="{{ imgname }}" disabled>
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" id="editbtn">Edit</button>
+					</span>
+				</div><!-- /input-group -->
+			</div><!-- /container -->
 			<div class="pixTable" style="width: 100%">
 				{% for r in range(16) %}
 				<div class="pixRow">
 					{% for c in range(16) %}
 					<div class="pixCell" id="{{ r }},{{ c }}" style="background-color:#{{ pixels[r][c] }};">
 						<input type="hidden" name="{{ r }},{{ c }}" value="row={{ r|string }},col={{ c|string }},h={{ pixels[r][c] }}" />
-					</div>
+					</div><!-- /pixCell -->
 					{% endfor %}
-				</div>
+				</div><!-- /pixRow -->
 				{% endfor %}
-			</div>
-			<div class="container">
-				<span><input type='text' id='myPicker' name='myPicker' /></span>
-				<button type="button" class="btn btn-default" id="fill"><span style="color:gray">Set All<span></button>
-				<button type="button" class="btn" id="revertbtn" disabled="disabled">Revert</button>
-				<button type="submit" class="btn" id="savebtn" disabled="disabled">Save</button>
-			</div>
+			</div><!-- /pixTable -->
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<span><input type='text' id='myPicker' name='myPicker' /></span>
+					<span class="pull-right">
+						<button type="button" class="btn btn-default" id="fill"><span style="color:gray">Set All<span></button>
+						<button type="button" class="btn" id="revertbtn" disabled="disabled">Revert</button>
+						<button type="submit" class="btn" id="savebtn" disabled="disabled">Save</button>
+					</span>
+				</div><!-- /panel-body -->
+			</div><!-- /panel -->
+			<div class="panel panel-success">
+				<div class="panel-heading">Animated?<span class="pull-right"><input type="checkbox" name="animated" id="animated" data-size="mini" data-on-text="Yes" data-off-text="No" data-on-color="success"></span></div>
+				<div class="panel-body">
+				</div>
+			</div><!-- /panel -->
 		</form>
 	</div>
 	<script>
 		var mouse_is_down = false;
-		var setColor = "white";
+		$setColor = "ffffff";
         $( "#myPicker" ).spectrum({
             showPaletteOnly: true,
             togglePaletteOnly: true,
@@ -39,13 +57,18 @@
         $( document ).ready(function() {
 			$( "li" ).removeClass("active");
 			$( "#nav-edit" ).addClass("active");
-			$( "#myPicker" ).spectrum( "set", setColor );
+			$( "#myPicker" ).spectrum( "set", $setColor );
+			$( "#animated" ).bootstrapSwitch({
+				setOnLabel: "Yes",
+				setOffLabel: "No",
+				setSizeClass: "mini"
+			});
         });
         $( ".pixCell" ).mousedown(function() {
-            setColor = $("#myPicker").spectrum("get");
-            $( this ).css( "background-color", setColor );
+            $setColor = $("#myPicker").spectrum("get");
+            $( this ).css( "background-color", $setColor );
             var value = $( this ).find( "input" ).val().split(",");
-            var newValue = value[0] + "," + value[1] + ",h=" + setColor.toHex();
+            var newValue = value[0] + "," + value[1] + ",h=" + $setColor.toHex();
             $( this ).find( "input" ).val( newValue );
             $( "#savebtn" ).removeAttr( "disabled" );
             $( "#revertbtn" ).removeAttr( "disabled" );
@@ -58,9 +81,9 @@
         });
         $( ".pixCell" ).mouseenter(function() {
             if (mouse_is_down) {
-				$( this ).css( "background-color", setColor );
+				$( this ).css( "background-color", $setColor );
 				var value = $( this ).find( "input" ).val().split(",");
-				var newValue = value[0] + "," + value[1] + ",h=" + setColor.toHex();
+				var newValue = value[0] + "," + value[1] + ",h=" + $setColor.toHex();
 				$( this ).find( "input" ).val( newValue );
 				$( "#savebtn" ).removeAttr( "disabled" );
 				$( "#revertbtn" ).removeAttr( "disabled" );
@@ -68,12 +91,17 @@
 				$( "#savebtn" ).addClass( "btn-warning" );
             } 
         });
+        $( "#editbtn" ).click(function() {
+        	$( "#imagename" ).removeAttr( "disabled");
+			$( "#savebtn" ).removeAttr( "disabled" );
+			$( "#savebtn" ).addClass( "btn-warning" );
+        });
         $( "#fill" ).click(function() {
-        	setColor = $( "#myPicker" ).spectrum("get");
-            $( ".pixCell" ).css( "background-color", setColor );
+        	$setColor = $( "#myPicker" ).spectrum("get");
+            $( ".pixCell" ).css( "background-color", $setColor );
             $( ".pixCell input" ).each(function() {
 				var value = $( this ).val().split(",");
-				var newValue = value[0] + "," + value[1] + ",h=" + setColor.toHex();
+				var newValue = value[0] + "," + value[1] + ",h=" + $setColor.toHex();
 				$( this ).val( newValue );
             });
             $( "#savebtn" ).removeAttr( "disabled" );

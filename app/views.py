@@ -48,14 +48,17 @@ def table():
 	if 'imgid' in request.form:
 		imgid = request.form['imgid']
 		session['imgid'] = imgid
+		imgname = Img.query.get(int(imgid)).imgname
 		pixelarray = Pixel.modelToArray(imgid)
 	elif 'imgid' in session:
 		imgid = session['imgid']
+		imgname = Img.query.get(int(imgid)).imgname
 		pixelarray = Pixel.modelToArray(imgid)
 	else:
 		pixelarray = [[0 for r in range(16)] for y in range(16)]
 		imgid = None
-	return render_template('table.html', title='PixelBox', form=form, pixels=pixelarray, imgid=imgid)
+		imgname = None
+	return render_template('table.html', title='PixelBox', form=form, pixels=pixelarray, imgid=imgid, imgname=imgname)
 
 @app.route('/update_pixels', methods=['POST'])
 def update_pixels():
@@ -67,7 +70,15 @@ def update_pixels():
 		return redirect(url_for('404'))
 	items = request.form
 	for key, value in items.iteritems():
-		if key != 'imgid' and key != 'myPicker':
+		if key == 'imgid':
+			break
+		elif key == 'myPicker':
+			break
+		elif key == 'imagename': 
+			name = Img.query.get(int(imgid))
+			name.imgname = value
+			db.session.commit()
+		else:
 			r, c, h = value.split(",")
 			a, row = r.split("=")
 			b, col = c.split("=")
