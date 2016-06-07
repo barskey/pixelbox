@@ -9,10 +9,8 @@
 			<div class="container">
 				<div class="input-group">
 					<div class="input-group-addon">Name</div>
-					<input type="text" class="form-control" id = "imagename" name="imagename" value="{{ imgname }}" disabled>
-					<span class="input-group-btn">
-						<button type="button" class="btn btn-default" id="editbtn">Edit</button>
-					</span>
+					<input type="text" class="form-control" id = "imagename" name="imagename" value="{{ imgname }}">
+					<div class="input-group-addon">Anim? <input type="checkbox" name="animated" id="animated" data-size="mini" data-on-text="Yes" data-off-text="No" data-on-color="success"></div>
 				</div><!-- /input-group -->
 			</div><!-- /container -->
 			<div class="pixTable" style="width: 100%">
@@ -26,21 +24,27 @@
 				</div><!-- /pixRow -->
 				{% endfor %}
 			</div><!-- /pixTable -->
-			<div class="panel panel-default">
-				<div class="panel-body">
-					<span><input type='text' id='myPicker' name='myPicker' /></span>
-					<span class="pull-right">
-						<button type="button" class="btn btn-default" id="fill"><span style="color:gray">Set All<span></button>
-						<button type="button" class="btn" id="revertbtn" disabled="disabled">Revert</button>
-						<button type="submit" class="btn" id="savebtn" disabled="disabled">Save</button>
-					</span>
-				</div><!-- /panel-body -->
-			</div><!-- /panel -->
-			<div class="panel panel-success">
-				<div class="panel-heading">Animated?<span class="pull-right"><input type="checkbox" name="animated" id="animated" data-size="mini" data-on-text="Yes" data-off-text="No" data-on-color="success"></span></div>
-				<div class="panel-body">
+			<div class="collapse" id="framecontrols">
+				<div class="well well-sm">
+					<div class="btn-toolbar" role="toolbar">
+						<div class="btn-group" role="group">
+							<button type="button" class="btn btn-default" id="firstframe" name="firstframe"><span class="glyphicon glyphicon-fast-backward"></span></button>
+							<button type="button" class="btn btn-default" id="prevframe" name="prevframe"><span class="glyphicon glyphicon-backward"></span></button>
+							<button type="button" class="btn btn-default" id="play" name="play"><span class="glyphicon glyphicon-play"></span></button>
+							<button type="button" class="btn btn-default" id="nextframe" name="nextframe"><span class="glyphicon glyphicon-forward"></span></button>
+							<button type="button" class="btn btn-default" id="lastframe" name="lastframe"><span class="glyphicon glyphicon-fast-forward"></span></button>
+						</div><!-- /input-group -->
+					</div><!-- /btn-toolbar -->
 				</div>
-			</div><!-- /panel -->
+			</div><!-- /collapse div -->
+			<div class="well well-sm">
+				<span><input type='text' id='myPicker' name='myPicker' /></span>
+				<span class="pull-right">
+					<button type="button" class="btn btn-default" id="fill"><span style="color:gray">Set All<span></button>
+					<button type="button" class="btn" id="revertbtn" disabled="disabled">Revert</button>
+					<button type="submit" class="btn" id="savebtn" disabled="disabled">Save</button>
+				</span>
+			</div><!-- /well -->
 		</form>
 	</div>
 	<script>
@@ -53,6 +57,9 @@
             change: function(color) {
             	$( "#fill" ).css( "background-color", color );
             }
+        });
+        $( "input[name='animated']").on("switchChange.bootstrapSwitch", function(event, state) {
+        	$( ".collapse" ).collapse("toggle");
         });
         $( document ).ready(function() {
 			$( "li" ).removeClass("active");
@@ -91,11 +98,6 @@
 				$( "#savebtn" ).addClass( "btn-warning" );
             } 
         });
-        $( "#editbtn" ).click(function() {
-        	$( "#imagename" ).removeAttr( "disabled");
-			$( "#savebtn" ).removeAttr( "disabled" );
-			$( "#savebtn" ).addClass( "btn-warning" );
-        });
         $( "#fill" ).click(function() {
         	$setColor = $( "#myPicker" ).spectrum("get");
             $( ".pixCell" ).css( "background-color", $setColor );
@@ -105,6 +107,9 @@
 				$( this ).val( newValue );
             });
             $( "#savebtn" ).removeAttr( "disabled" );
+			$( "#revertbtn" ).removeAttr( "disabled" );
+			$( "#revertbtn" ).addClass( "btn-success" );
+			$( "#savebtn" ).addClass( "btn-warning" );
         });
         $( "#revertbtn" ).click(function() {
             location.reload();

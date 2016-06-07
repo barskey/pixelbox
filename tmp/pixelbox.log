@@ -255,3 +255,7 @@
 2016-06-05 22:25:30,515 INFO: PixelBox startup [in /Users/steve/Dropbox/repros/pixelbox-app/app/__init__.py:16]
 2016-06-05 22:25:30,763 INFO: PixelBox startup [in /Users/steve/Dropbox/repros/pixelbox-app/app/__init__.py:16]
 2016-06-05 22:26:50,615 INFO: PixelBox startup [in app/__init__.py:16]
+2016-06-06 17:50:56,249 INFO: PixelBox startup [in /Users/steve/Dropbox/repros/pixelbox-app/app/__init__.py:16]
+2016-06-06 17:50:56,515 INFO: PixelBox startup [in /Users/steve/Dropbox/repros/pixelbox-app/app/__init__.py:16]
+2016-06-06 17:54:17,254 INFO: PixelBox startup [in /Users/steve/Dropbox/repros/pixelbox-app/app/__init__.py:16]
+2016-06-06 17:55:51,268 INFO: PixelBox startup [in /Users/steve/Dropbox/repros/pixelbox-app/app/__init__.py:16]

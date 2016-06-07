@@ -66,19 +66,15 @@ def update_pixels():
 	try:
 		imgid = request.form['imgid']
 		session['imgid'] = imgid
-	except imgidNotFound:
-		return redirect(url_for('404'))
+		newname = request.form['imagename']
+		name = Img.query.get(int(imgid))
+		name.imgname = newname
+		db.session.commit()
+	except LookupError:
+		return render_template('404.html')
 	items = request.form
 	for key, value in items.iteritems():
-		if key == 'imgid':
-			break
-		elif key == 'myPicker':
-			break
-		elif key == 'imagename': 
-			name = Img.query.get(int(imgid))
-			name.imgname = value
-			db.session.commit()
-		else:
+		if key != 'imgid' and key != 'myPicker' and key != 'imagename':
 			r, c, h = value.split(",")
 			a, row = r.split("=")
 			b, col = c.split("=")
