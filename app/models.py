@@ -31,6 +31,7 @@ class Img(db.Model):
 class Pixel(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	img_id = db.Column(db.Integer, db.ForeignKey('img.id'))
+	frame = db.Column(db.Integer)
 	row = db.Column(db.Integer)
 	col= db.Column(db.Integer)
 	hexvalue = db.Column(db.String(6))

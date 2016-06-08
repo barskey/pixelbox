@@ -27,7 +27,7 @@ def images():
 		newimgid = newimgname.id
 		for r in range (16):
 			for c in range (16):
-				pixel = Pixel(img_id = newimgid, row = r, col = c, hexvalue = '000000')
+				pixel = Pixel(img_id = newimgid, frame=1, row = r, col = c, hexvalue = '000000')
 				db.session.add(pixel)
 		db.session.commit()
 		return redirect(url_for('images'))
@@ -44,37 +44,46 @@ def delete_image():
 @app.route('/table', methods=['GET', 'POST'])
 def table():
 	imgid = None
+	img = None
 	form = TableForm()
 	if 'imgid' in request.form:
 		imgid = request.form['imgid']
 		session['imgid'] = imgid
-		imgname = Img.query.get(int(imgid)).imgname
+		img = Img.query.get(int(imgid))
 		pixelarray = Pixel.modelToArray(imgid)
 	elif 'imgid' in session:
 		imgid = session['imgid']
-		imgname = Img.query.get(int(imgid)).imgname
+		img = Img.query.get(int(imgid))
 		pixelarray = Pixel.modelToArray(imgid)
 	else:
+		img['imgname'] = ''
+		img['animated'] = False
 		pixelarray = [[0 for r in range(16)] for y in range(16)]
-		imgid = None
-		imgname = None
-	return render_template('table.html', title='PixelBox', form=form, pixels=pixelarray, imgid=imgid, imgname=imgname)
+	return render_template('table.html', title='PixelBox', form=form, pixels=pixelarray, imgid=imgid, imgname=img.imgname, animated=img.animated)
 
 @app.route('/update_pixels', methods=['POST'])
 def update_pixels():
 	imgid = None
+	animated = False;
 	try:
 		imgid = request.form['imgid']
 		session['imgid'] = imgid
-		newname = request.form['imagename']
-		name = Img.query.get(int(imgid))
-		name.imgname = newname
-		db.session.commit()
 	except LookupError:
 		return render_template('404.html')
+	try:
+		anim = request.form['animated']
+		if anim == 'on':
+			animated = True
+	except:
+		animated = False;
+	newname = request.form['imagename']
+	img = Img.query.get(int(imgid))
+	img.imgname = newname
+	img.animated = animated
+	db.session.commit()
 	items = request.form
 	for key, value in items.iteritems():
-		if key != 'imgid' and key != 'myPicker' and key != 'imagename':
+		if key.startswith('pix_'):
 			r, c, h = value.split(",")
 			a, row = r.split("=")
 			b, col = c.split("=")
@@ -86,8 +95,6 @@ def update_pixels():
 
 @app.route('/testpost', methods=['POST'])
 def testpost():
-	if 'imgid' in request.args:
-		imgid = int(request.args['imgid'])
 	items = request.form
 	return render_template('testpost.html', items=items)
 

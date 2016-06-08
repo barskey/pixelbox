@@ -9,8 +9,8 @@
 			<div class="container">
 				<div class="input-group">
 					<div class="input-group-addon">Name</div>
-					<input type="text" class="form-control" id = "imagename" name="imagename" value="{{ imgname }}">
-					<div class="input-group-addon">Anim? <input type="checkbox" name="animated" id="animated" data-size="mini" data-on-text="Yes" data-off-text="No" data-on-color="success"></div>
+					<input type="text" class="form-control" id="imagename" name="imagename" value="{{ imgname }}">
+					<div class="input-group-addon">Anim? <input type="checkbox" name="animated" data-size="mini" data-on-text="Yes" data-off-text="No" data-on-color="success" {% if animated %}checked{% endif %}></div>
 				</div><!-- /input-group -->
 			</div><!-- /container -->
 			<div class="pixTable" style="width: 100%">
@@ -18,7 +18,7 @@
 				<div class="pixRow">
 					{% for c in range(16) %}
 					<div class="pixCell" id="{{ r }},{{ c }}" style="background-color:#{{ pixels[r][c] }};">
-						<input type="hidden" name="{{ r }},{{ c }}" value="row={{ r|string }},col={{ c|string }},h={{ pixels[r][c] }}" />
+						<input type="hidden" name="pix_r{{ r }}_c{{ c }}" value="row={{ r|string }},col={{ c|string }},h={{ pixels[r][c] }}" />
 					</div><!-- /pixCell -->
 					{% endfor %}
 				</div><!-- /pixRow -->
@@ -27,13 +27,20 @@
 			<div class="collapse" id="framecontrols">
 				<div class="well well-sm">
 					<div class="btn-toolbar" role="toolbar">
-						<div class="btn-group" role="group">
+						<div class="btn-group text-left" role="group">
+							<button type="button" class="btn" id="frames" disabled="disabled">1 of 10</button>
+						</div><!-- /btn-group -->
+						<div class="btn-group text-center" role="group">
 							<button type="button" class="btn btn-default" id="firstframe" name="firstframe"><span class="glyphicon glyphicon-fast-backward"></span></button>
 							<button type="button" class="btn btn-default" id="prevframe" name="prevframe"><span class="glyphicon glyphicon-backward"></span></button>
 							<button type="button" class="btn btn-default" id="play" name="play"><span class="glyphicon glyphicon-play"></span></button>
 							<button type="button" class="btn btn-default" id="nextframe" name="nextframe"><span class="glyphicon glyphicon-forward"></span></button>
 							<button type="button" class="btn btn-default" id="lastframe" name="lastframe"><span class="glyphicon glyphicon-fast-forward"></span></button>
-						</div><!-- /input-group -->
+						</div><!-- /btn-group -->
+						<div class="btn-group text-right" role="group">
+							<button type="button" class="btn btn-default" id="addframe" name="addframe"><span class="glyphicon glyphicon-plus"></span></button>
+							<button type="button" class="btn btn-default" id="delframe" name="delframe"><span class="glyphicon glyphicon-minus"></span></button>
+						</div><!-- /btn-group -->
 					</div><!-- /btn-toolbar -->
 				</div>
 			</div><!-- /collapse div -->
@@ -50,6 +57,7 @@
 	<script>
 		var mouse_is_down = false;
 		$setColor = "ffffff";
+		$( "input[name='animated']").bootstrapSwitch();
         $( "#myPicker" ).spectrum({
             showPaletteOnly: true,
             togglePaletteOnly: true,
@@ -60,16 +68,18 @@
         });
         $( "input[name='animated']").on("switchChange.bootstrapSwitch", function(event, state) {
         	$( ".collapse" ).collapse("toggle");
+            $( "#savebtn" ).removeAttr( "disabled" );
+			$( "#revertbtn" ).removeAttr( "disabled" );
+			$( "#revertbtn" ).addClass( "btn-success" );
+			$( "#savebtn" ).addClass( "btn-warning" );
         });
         $( document ).ready(function() {
 			$( "li" ).removeClass("active");
 			$( "#nav-edit" ).addClass("active");
 			$( "#myPicker" ).spectrum( "set", $setColor );
-			$( "#animated" ).bootstrapSwitch({
-				setOnLabel: "Yes",
-				setOffLabel: "No",
-				setSizeClass: "mini"
-			});
+			if ($( "input[name='animated']").bootstrapSwitch("state")) {
+				$( ".collapse" ).collapse("toggle");
+			}
         });
         $( ".pixCell" ).mousedown(function() {
             $setColor = $("#myPicker").spectrum("get");
