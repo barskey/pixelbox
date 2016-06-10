@@ -1,6 +1,12 @@
 body
 {
-	padding-top: 70px;
+	padding-top: 55px;
+}
+.top5 {
+	margin-top: 5px;
+}
+.top7 {
+	margin-top: 7px;
 }
 .pixTable
 {

@@ -56,10 +56,10 @@ def table():
 		img = Img.query.get(int(imgid))
 		pixelarray = Pixel.modelToArray(imgid)
 	else:
-		img['imgname'] = ''
-		img['animated'] = False
+		img = Img(imgname='', animated=False, fps=0)
 		pixelarray = [[0 for r in range(16)] for y in range(16)]
-	return render_template('table.html', title='PixelBox', form=form, pixels=pixelarray, imgid=imgid, imgname=img.imgname, animated=img.animated)
+	return render_template('table.html', title='PixelBox', form=form, pixels=pixelarray, 
+		imgid=imgid, imgname=img.imgname, animated=img.animated)
 
 @app.route('/update_pixels', methods=['POST'])
 def update_pixels():
