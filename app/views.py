@@ -45,37 +45,42 @@ def delete_image():
 def table():
 	imgid = None
 	img = None
+	frame = '1'
+	totframes = 1
 	form = TableForm()
 	if 'imgid' in request.form:
 		imgid = request.form['imgid']
 		session['imgid'] = imgid
 		img = Img.query.get(int(imgid))
-		pixelarray = Pixel.modelToArray(imgid)
+		frame = request.form['frame']
+		session['frame'] = frame
+		pixelarray = Pixel.modelToArray(imgid, frame)
+		totframes = Pixel.query.filter_by(img_id = int(imgid)).group_by(Pixel.frame).count()
 	elif 'imgid' in session:
 		imgid = session['imgid']
 		img = Img.query.get(int(imgid))
-		pixelarray = Pixel.modelToArray(imgid)
+		frame = session['frame']
+		pixelarray = Pixel.modelToArray(imgid, frame)
+		totframes = Pixel.query.filter_by(img_id = int(imgid)).group_by(Pixel.frame).count()
 	else:
 		img = Img(imgname='', animated=False, fps=0)
 		pixelarray = [[0 for r in range(16)] for y in range(16)]
 	return render_template('table.html', title='PixelBox', form=form, pixels=pixelarray, 
-		imgid=imgid, imgname=img.imgname, animated=img.animated)
+		imgid=imgid, imgname=img.imgname, animated=img.animated, frame=frame, totframes=totframes)
 
 @app.route('/update_pixels', methods=['POST'])
 def update_pixels():
-	imgid = None
 	animated = False;
-	try:
-		imgid = request.form['imgid']
-		session['imgid'] = imgid
-	except LookupError:
-		return render_template('404.html')
+	imgid = request.form['imgid']
+	session['imgid'] = imgid
+	frame = request.form['frame']
+	session['frame'] = frame
 	try:
 		anim = request.form['animated']
 		if anim == 'on':
 			animated = True
 	except:
-		animated = False;
+		aminated = False;
 	newname = request.form['imagename']
 	img = Img.query.get(int(imgid))
 	img.imgname = newname
@@ -88,11 +93,52 @@ def update_pixels():
 			a, row = r.split("=")
 			b, col = c.split("=")
 			c, hex = h.split("=")
-			pixel = Pixel.query.filter_by(row=row, col=col, img_id=int(imgid)).first()
+			pixel = Pixel.query.filter_by(img_id=int(imgid), frame=int(frame), row=int(row), col=int(col)).first()
 			pixel.hexvalue = hex
 			db.session.commit() 
 	return redirect(url_for('table'))
 
+@app.route('/add_frame', methods=['POST'])
+def add_frame():
+	imgid = request.form['imgid']
+	session['imgid'] = imgid
+	frame = request.form['frame']
+	session['frame'] = int(frame) + 1
+	totframes = Pixel.query.filter_by(img_id = imgid).group_by(Pixel.frame).count()
+	for i in range (int(frame) + 1, totframes + 1):
+		newframe = Pixel.query.filter_by(img_id = int(imgid), frame = i).update(dict(frame=(i + 1)))
+		db.session.commit()
+	frames = Pixel.query.filter_by(img_id = int(imgid), frame = int(frame))
+	for thisframe in frames:
+		pixel = Pixel(img_id = int(imgid), frame=int(frame) + 1, row = thisframe.row, col = thisframe.col, hexvalue = thisframe.hexvalue)
+		db.session.add(pixel)
+	db.session.commit()
+	return redirect(url_for('table'))
+
+@app.route('/delete_frame', methods=['POST'])
+def delete_frame():
+	imgid = request.form['imgid']
+	session['imgid'] = imgid
+	frame = request.form['frame']
+	if int(frame) == 1:
+		session['frame'] = 1
+	else:
+		session['frame'] = int(frame) - 1
+	flag = False
+	counter = 1
+	totframes = Pixel.query.filter_by(img_id = imgid).group_by(Pixel.frame).count()
+	for i in range(1, totframes + 1):
+		if i == int(frame):
+			frames = Pixel.query.filter_by(img_id = int(imgid), frame = i)
+			for thisframe in frames:
+				db.session.delete(thisframe)
+			flag = True
+		elif flag:
+			newframe = Pixel.query.filter_by(img_id = int(imgid), frame = i).update(dict(frame=(i - 1)))
+		counter = counter + 1
+	db.session.commit()
+	return redirect(url_for('table'))
+    
 @app.route('/testpost', methods=['POST'])
 def testpost():
 	items = request.form

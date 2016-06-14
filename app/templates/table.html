@@ -4,8 +4,9 @@
 {% block content %}
 	<div class="container-fluid">
 		<!--Table content-->
-		<form action="update_pixels" method="post" name="pixTable">
+		<form action="update_pixels" method="post" name="pixForm" id="pixForm">
 			{{ form.imgid(value=imgid) }}
+			{{ form.frame(id="frame", value=frame) }}
 			<div class="container">
 				<div class="input-group">
 					<div class="input-group-addon">Name</div>
@@ -29,18 +30,18 @@
 					<div class="row">
 						<div class="col-xs-6 text-left">
 							<div class="btn-group">
-								<button type="button" class="btn btn-default" id="firstframe" name="firstframe"><span class="glyphicon glyphicon-fast-backward"></span></button>
+								<button type="button" class="btn btn-default" id="prev-frame" name="prev-frame" data-frame-dir="-1" {% if frame|int == 1 %}disabled="disabled"{% endif %}><span class="glyphicon glyphicon-fast-backward"></span></button>
 								<button type="button" class="btn btn-default" id="play" name="play"><span class="glyphicon glyphicon-play"></span></button>
-								<button type="button" class="btn btn-default" id="lastframe" name="lastframe"><span class="glyphicon glyphicon-fast-forward"></span></button>
+								<button type="button" class="btn btn-default" id="next-frame" name="next-frame" data-frame-dir="1" {% if frame|int == totframes|int %}disabled="disabled"{% endif %}><span class="glyphicon glyphicon-fast-forward"></span></button>
 							</div><!-- /btn-group -->
 						</div><!-- /col -->
 						<div class="col-xs-2 text-center">
-							<h5 class="text-center">1/10</h5>
+							<h5 class="text-center">{{ frame }}/{{ totframes }}</h5>
 						</div>
 						<div class="col-xs-4 text-right">
 							<div class="btn-group">
-								<button type="button" class="btn btn-default" id="delframe" name="delframe"><span class="glyphicon glyphicon-minus"></span></button>
-								<button type="button" class="btn btn-default" id="addframe" name="addframe"><span class="glyphicon glyphicon-plus"></span></button>
+								<button type="button" class="btn btn-default" id="del-frame" name="del-frame" {% if totframes|int == 1 %}disabled="disabled"{% endif %}><span class="glyphicon glyphicon-minus"></span></button>
+								<button type="button" class="btn btn-default" id="add-frame" name="add-frame"><span class="glyphicon glyphicon-plus"></span></button>
 							</div><!-- /btn-group -->
 						</div><!-- /col -->
 					</div><!-- /row -->
@@ -92,6 +93,7 @@
             $( "#revertbtn" ).removeAttr( "disabled" );
             $( "#revertbtn" ).addClass( "btn-success" );
             $( "#savebtn" ).addClass( "btn-warning" );
+            $( "#add-frame" ).attr("disabled", "disabled");
         }
         $( "input[name='animated']").on("switchChange.bootstrapSwitch", function(event, state) {
         	$( ".collapse" ).collapse("toggle");
@@ -182,5 +184,19 @@
 			}
         	setButtons();
         });
+        $( "#add-frame" ).click(function() {
+        	$( "#pixForm" ).attr( "action", "add_frame" );
+        	$( "#pixForm" ).submit();
+        });
+        $( "#del-frame" ).click(function() {
+        	$( "#pixForm" ).attr( "action", "delete_frame" );
+        	$( "#pixForm" ).submit();
+        });
+		$( "[data-frame-dir]" ).click(function() {
+			var dir = $( this ).data("frame-dir");
+			$( "#frame" ).val( {{ frame }} + parseInt(dir) );
+        	$( "#pixForm" ).attr( "action", "table" );
+        	$( "#pixForm" ).submit();
+		});
 	</script>
 {% endblock %}
