@@ -45,6 +45,12 @@
 							</div><!-- /btn-group -->
 						</div><!-- /col -->
 					</div><!-- /row -->
+					<div class="row top7">
+						<div class="col-xs-4 text-right">Speed</div>
+						<div class="col-xs-8 text-center">
+							<input type="text" name="fps-slider" data-provide="slider" data-slider-min="1" data-slider-max="20" data-slider-step="1" data-slider-value="{{ fps }}" data-slider-tooltip="hide">
+						</div><!-- /col -->
+					</div><!-- /row -->
 				</div><!-- /collapse -->
 				<div class="row top7">
 					<div class="col-xs-5 text-center">
@@ -70,7 +76,7 @@
 				</span>
 				<span class="pull-right">
 					<button type="button" class="btn" id="revertbtn" disabled="disabled">Revert</button>
-					<button type="submit" class="btn" id="savebtn" disabled="disabled">Save</button>
+					<button type="button" class="btn" id="savebtn" data-loading-text="Saving..." disabled="disabled">Save</button>
 				</span>
 			</div><!-- /container -->
 		</form>
@@ -96,7 +102,7 @@
             $( "#add-frame" ).attr("disabled", "disabled");
         }
         $( "input[name='animated']").on("switchChange.bootstrapSwitch", function(event, state) {
-        	$( ".collapse" ).collapse("toggle");
+        	$( "#framecontrols" ).collapse("toggle");
  			setButtons();
         });
         $( document ).ready(function() {
@@ -104,7 +110,7 @@
 			$( "#nav-edit" ).addClass("active");
 			$( "#myPicker" ).spectrum( "set", $setColor );
 			if ($( "input[name='animated']").bootstrapSwitch("state")) {
-				$( ".collapse" ).collapse("toggle");
+				$( "#framecontrols" ).collapse("show");
 			}
         });
         $( ".pixCell" ).mousedown(function() {
@@ -141,6 +147,27 @@
         $( "#revertbtn" ).click(function() {
             location.reload();
         });
+        $( "#savebtn" ).click(function() {
+        	var $btn = $( this ).button("loading");
+			$.ajax({
+				url: "/update_pixels",
+				data: $( "#pixForm" ).serialize(),
+				type: "POST",
+				dataType: "json",
+				success: function( response ) {
+					if (response.status == "OK") {
+						$btn.button("reset");
+						window.setTimeout( function() {
+							$( "#revertbtn" ).attr( "disabled", "disabled" ).removeClass( "btn-success" );
+							$( "#savebtn" ).attr( "disabled", "disabled" ).removeClass( "btn-warning" );
+						}, 100)
+					}
+				},
+				error: function( error ) {
+					console.log(error);
+				}
+			});
+		});
         $( "[data-move-pixels]" ).click(function() {
         	var pixArray = []; 
 			while(pixArray.push([]) < 16);
@@ -197,6 +224,9 @@
 			$( "#frame" ).val( {{ frame }} + parseInt(dir) );
         	$( "#pixForm" ).attr( "action", "table" );
         	$( "#pixForm" ).submit();
+		});
+		$( "input[name='fps-slider']" ).on("slide", function() {
+			setButtons();
 		});
 	</script>
 {% endblock %}

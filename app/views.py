@@ -1,4 +1,5 @@
-from flask import render_template, flash, redirect, url_for, session, request, g
+from flask import render_template, flash, redirect, url_for, session, request, json
+from PIL import Image
 from app import app, db
 from .forms import TableForm, SettingsForm, ImagesForm
 from .models import Img, Pixel
@@ -63,10 +64,10 @@ def table():
 		pixelarray = Pixel.modelToArray(imgid, frame)
 		totframes = Pixel.query.filter_by(img_id = int(imgid)).group_by(Pixel.frame).count()
 	else:
-		img = Img(imgname='', animated=False, fps=0)
+		img = Img(imgname='', animated=False, fps=1)
 		pixelarray = [[0 for r in range(16)] for y in range(16)]
 	return render_template('table.html', title='PixelBox', form=form, pixels=pixelarray, 
-		imgid=imgid, imgname=img.imgname, animated=img.animated, frame=frame, totframes=totframes)
+		imgid=imgid, imgname=img.imgname, animated=img.animated, frame=frame, totframes=totframes, fps=img.fps)
 
 @app.route('/update_pixels', methods=['POST'])
 def update_pixels():
@@ -81,22 +82,24 @@ def update_pixels():
 			animated = True
 	except:
 		aminated = False;
+	slider = request.form['fps-slider']
 	newname = request.form['imagename']
 	img = Img.query.get(int(imgid))
 	img.imgname = newname
 	img.animated = animated
+	img.fps = slider
 	db.session.commit()
 	items = request.form
 	for key, value in items.iteritems():
 		if key.startswith('pix_'):
-			r, c, h = value.split(",")
-			a, row = r.split("=")
-			b, col = c.split("=")
-			c, hex = h.split("=")
+			r, c, h = value.split(',')
+			a, row = r.split('=')
+			b, col = c.split('=')
+			c, hex = h.split('=')
 			pixel = Pixel.query.filter_by(img_id=int(imgid), frame=int(frame), row=int(row), col=int(col)).first()
 			pixel.hexvalue = hex
 			db.session.commit() 
-	return redirect(url_for('table'))
+	return json.dumps({'status':'OK'})
 
 @app.route('/add_frame', methods=['POST'])
 def add_frame():
