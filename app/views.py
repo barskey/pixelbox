@@ -31,6 +31,9 @@ def images():
 				pixel = Pixel(img_id = newimgid, frame=1, row = r, col = c, hexvalue = '000000')
 				db.session.add(pixel)
 		db.session.commit()
+		im = Image.new("RGB", (16, 16))
+		fp = 'app/static/thumbs/' + newimgname.imgname + '.png'
+		im.save(fp)
 		return redirect(url_for('images'))
 	return render_template('images.html', title='Images', image_list=image_list, form=form)
 
@@ -89,6 +92,8 @@ def update_pixels():
 	img.animated = animated
 	img.fps = slider
 	db.session.commit()
+	im = Image.new("RGB", (16, 16))
+	thumb = im.load()	
 	items = request.form
 	for key, value in items.iteritems():
 		if key.startswith('pix_'):
@@ -98,7 +103,11 @@ def update_pixels():
 			c, hex = h.split('=')
 			pixel = Pixel.query.filter_by(img_id=int(imgid), frame=int(frame), row=int(row), col=int(col)).first()
 			pixel.hexvalue = hex
-			db.session.commit() 
+			db.session.commit()
+			thumb[int(col),int(row)] = (int("0x" + hex[0:2], 0), int("0x" + hex[2:4], 0), int("0x" + hex[4:6], 0))
+	fp = 'app/static/thumbs/' + newname + '.png'
+	if (int(frame) == 1):
+		im.save(fp)
 	return json.dumps({'status':'OK'})
 	
 @app.route('/_get_animation')

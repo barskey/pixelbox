@@ -9,7 +9,7 @@
 				{% for i in image_list %}
 				<li id="{{ i.id }}" class="list-group-item">
 					<button type="button" class="btn btn-default" id="imgbtn">
-						<img src="{{ url_for('static', filename='thumbs/03.png') }}">
+						<img src="{{ url_for('static', filename='thumbs/' + i.imgname + '.png') }}">
 					</button>
 					&nbsp;&nbsp;{% if i.animated %}<span class="glyphicon glyphicon-film text-success">{% else %}&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}</span>
 					&nbsp;{{ i.imgname }}<input type="hidden" name="frame" value="1" />
