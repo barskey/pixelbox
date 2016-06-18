@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, session, request, json
+from flask import render_template, flash, redirect, url_for, session, request, json, jsonify
 from PIL import Image
 from app import app, db
 from .forms import TableForm, SettingsForm, ImagesForm
@@ -100,6 +100,15 @@ def update_pixels():
 			pixel.hexvalue = hex
 			db.session.commit() 
 	return json.dumps({'status':'OK'})
+	
+@app.route('/_get_animation')
+def get_animation():
+	imgid = request.args.get('imgid', 0, type=int)
+	pixels = Pixel.query.filter_by(img_id = imgid).order_by(Pixel.frame)
+	test = []
+	for pixel in pixels:
+		test.append({ "frame": pixel.frame,"row": pixel.row, "col": pixel.col, "hex": pixel.hexvalue})
+	return jsonify(pixels = test)
 
 @app.route('/add_frame', methods=['POST'])
 def add_frame():

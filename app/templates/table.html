@@ -81,8 +81,10 @@
 			</div><!-- /container -->
 		</form>
 	</div>
-	<script>
+	<script type="text/javascript">
+		$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 		var mouse_is_down = false;
+		var runFlag = false;
 		$setColor = "ffffff";
 		$( "input[name='animated']").bootstrapSwitch();
         $( "#myPicker" ).spectrum({
@@ -211,6 +213,67 @@
 			}
         	setButtons();
         });
+		function setPixelFrame(frame, pixelFrame) {
+			for (var r=0; r<16; r++) {
+				for (var c=0; c<16; c++) {
+					var val = "row=" + r + ",col=" + c + ",h=" + pixelFrame[r][c];
+					$( "input[name='pix_r" + r + "_c" + c + "']" ).val( val);
+					var id = "#" + r + "_" + c;
+					$( id ).css( "background-color", "#" + pixelFrame[r][c] );
+				}
+			}
+		}
+		function toggleGreen( $btn ) {
+			if ($btn.hasClass( "btn-success" )) {
+				$btn.removeClass( "btn-success" ).removeAttr( "disabled");
+			} else {
+				$btn.addClass( "btn-success" ).attr( "disabled", "disabled" );
+			}
+		}
+		function playFrames() {
+			var pixFrames = new Array({{ totframes + 1 }});
+			for (var i=1; i<pixFrames.length; i++) {
+				var tmp = []
+				while(tmp.push([]) < 16);
+				pixFrames[i] = tmp;
+			}
+			$.getJSON( $SCRIPT_ROOT + "/_get_animation", {
+				imgid: $( "#imgid" ).val()
+			}, function(data) {
+				$.each( data.pixels, function ( index, value ) {
+					var r = value.row;
+					var c = value.col;
+					var f = value.frame;
+					var h = value.hex;
+					//console.log(f, r, c, h);
+					pixFrames[f][r][c] = h;
+				});
+				//console.log(pixFrames);
+				function loopdelay(j) {
+					var fps = $( "input[name='fps-slider']" ).val();
+					var speedms = (1 / fps) * 1000;
+					if (j < pixFrames.length) {
+						//console.log(pixFrames[j]);
+						setPixelFrame(j, pixFrames[j]);
+						setTimeout(function() {
+							j++;
+							loopdelay(j);
+						}, speedms);
+					} else {
+						toggleGreen( $( "#play" ) );
+						runFlag = false;
+					}
+				}
+				loopdelay(1);
+			});
+		}
+		$( "#play" ).click(function() {
+			toggleGreen( $( this ) );
+			runFlag = !runFlag;
+			if (runFlag) {
+				playFrames();
+			}
+		});
         $( "#add-frame" ).click(function() {
         	$( "#pixForm" ).attr( "action", "add_frame" );
         	$( "#pixForm" ).submit();

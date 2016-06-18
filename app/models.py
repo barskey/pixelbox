@@ -1,4 +1,5 @@
 from app import db
+from flask import json
 
 class Img(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -43,6 +44,3 @@ class Pixel(db.Model):
 		for pixel in pixels:
 			pixelarray[pixel.row][pixel.col] = pixel.hexvalue
 		return pixelarray
-	
-	def __repr__(self):
-		return '<Pixel r:%ic:%i %r frame:%f>' % (self.row, self.col, self.hexvalue, self.frame)
