@@ -42,6 +42,9 @@ def delete_image():
 	imgid = int(request.args['imgid'])
 	img = Img.query.get(imgid)
 	db.session.delete(img)
+	pixels = Pixel.query.filter_by(img_id=imgid)
+	for pixel in pixels:
+		db.session.delete(pixel)
 	db.session.commit()
 	return redirect(url_for('images'))
 	

@@ -71,7 +71,7 @@
 			<div class="contianer">
 				<span class="pull-left">
 					<label class="btn btn-default btn-file" for="importfile">
-						Import<input type="file" style="display: none;" id="importfile">
+						Import<input type="file" style="display: none;" id="importfile" onchange="onFileSelected(event)">
 					</label>
 				</span>
 				<span class="pull-right">
@@ -226,9 +226,9 @@
 		}
 		function toggleGreen( $btn ) {
 			if ($btn.hasClass( "btn-success" )) {
-				$btn.removeClass( "btn-success" ).removeAttr( "disabled");
+				$btn.removeClass( "btn-success" );
 			} else {
-				$btn.addClass( "btn-success" ).attr( "disabled", "disabled" );
+				$btn.addClass( "btn-success" );
 			}
 		}
 		function playFrames() {
@@ -253,16 +253,15 @@
 				function loopdelay(j) {
 					var fps = $( "input[name='fps-slider']" ).val();
 					var speedms = (1 / fps) * 1000;
-					if (j < pixFrames.length) {
+					if (j < pixFrames.length && runFlag) {
 						//console.log(pixFrames[j]);
 						setPixelFrame(j, pixFrames[j]);
 						setTimeout(function() {
 							j++;
 							loopdelay(j);
 						}, speedms);
-					} else {
-						toggleGreen( $( "#play" ) );
-						runFlag = false;
+					} else if (runFlag) {
+						loopdelay(1);
 					}
 				}
 				loopdelay(1);
@@ -272,7 +271,7 @@
 			toggleGreen( $( this ) );
 			runFlag = !runFlag;
 			if (runFlag) {
-				playFrames();
+				setTimeout(playFrames(), 0);
 			}
 		});
         $( "#add-frame" ).click(function() {
