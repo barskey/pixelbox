@@ -1,13 +1,13 @@
-from flask.ext.wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField
 from wtforms.validators import DataRequired
 
-class TableForm(Form):
+class TableForm(FlaskForm):
     imgid = HiddenField('imgid')
     frame = HiddenField('frame')
 
-class SettingsForm(Form):
+class SettingsForm(FlaskForm):
     imgduration = StringField('imgduration', default='30', validators=[DataRequired()])
 
-class ImagesForm(Form):
+class ImagesForm(FlaskForm):
     imgname = StringField('imgname', validators=[DataRequired()])
